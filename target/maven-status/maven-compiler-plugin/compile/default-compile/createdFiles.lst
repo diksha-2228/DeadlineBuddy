@@ -1,0 +1,9 @@
+com\deadlinebuddy\service\AssignmentService.class
+com\deadlinebuddy\repository\AssignmentRepository.class
+com\deadlinebuddy\config\DataInitializer.class
+com\deadlinebuddy\controller\AssignmentController.class
+com\deadlinebuddy\controller\ApiController.class
+com\deadlinebuddy\DeadlineBuddyApplication.class
+com\deadlinebuddy\model\Priority.class
+com\deadlinebuddy\model\Status.class
+com\deadlinebuddy\model\Assignment.class

@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: html_head('Dashboard')}"></head>
+<body>
+
+    <!-- Top Navigation -->
+    <nav th:replace="~{fragments/layout :: navbar}"></nav>
+
+    <!-- Flash Notifications (Success / Error) -->
+    <div th:replace="~{fragments/layout :: flash_messages}"></div>
+
+    <!-- Main Content -->
+    <main class="container my-4">
+
+        <!-- Page Header -->
+        <div class="d-flex flex-wrap justify-content-between align-items-center mb-4 gap-2">
+            <div>
+                <h1 class="h3 fw-bold mb-1">
+                    <i class="bi bi-speedometer2 text-primary me-2"></i>Dashboard
+                </h1>
+                <p class="text-muted mb-0">Overview of your academic assignments and upcoming deadlines.</p>
+            </div>
+            <div class="d-flex gap-2">
+                <a th:href="@{/assignments/new}" class="btn btn-primary d-flex align-items-center gap-1 shadow-sm">
+                    <i class="bi bi-plus-circle"></i>
+                    <span>Add Assignment</span>
+                </a>
+                <a th:href="@{/assignments}" class="btn btn-outline-secondary d-flex align-items-center gap-1">
+                    <i class="bi bi-list-task"></i>
+                    <span>View All</span>
+                </a>
+            </div>
+        </div>
+
+        <!-- 5 Summary Cards Row -->
+        <div class="row g-3 mb-4">
+            <!-- Total -->
+            <div class="col-6 col-md-4 col-lg-2-4" style="flex: 1 0 18%;">
+                <div class="card stat-card p-3 bg-white h-100">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <span class="stat-label text-muted d-block">Total</span>
+                            <span class="stat-number text-dark" th:text="${summary.total}">0</span>
+                        </div>
+                        <i class="bi bi-journal-text stat-icon text-primary"></i>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Pending -->
+            <div class="col-6 col-md-4 col-lg-2-4" style="flex: 1 0 18%;">
+                <div class="card stat-card p-3 bg-white h-100">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <span class="stat-label text-muted d-block">Pending</span>
+                            <span class="stat-number text-warning" th:text="${summary.pending}">0</span>
+                        </div>
+                        <i class="bi bi-hourglass-split stat-icon text-warning"></i>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Completed -->
+            <div class="col-6 col-md-4 col-lg-2-4" style="flex: 1 0 18%;">
+                <div class="card stat-card p-3 bg-white h-100">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <span class="stat-label text-muted d-block">Completed</span>
+                            <span class="stat-number text-success" th:text="${summary.completed}">0</span>
+                        </div>
+                        <i class="bi bi-check-circle-fill stat-icon text-success"></i>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Overdue -->
+            <div class="col-6 col-md-6 col-lg-2-4" style="flex: 1 0 18%;">
+                <div class="card stat-card p-3 bg-white h-100">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <span class="stat-label text-muted d-block">Overdue</span>
+                            <span class="stat-number text-danger" th:text="${summary.overdue}">0</span>
+                        </div>
+                        <i class="bi bi-exclamation-triangle-fill stat-icon text-danger"></i>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Due in 3 Days -->
+            <div class="col-12 col-md-6 col-lg-2-4" style="flex: 1 0 18%;">
+                <div class="card stat-card p-3 bg-white h-100">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <span class="stat-label text-muted d-block">Due in 3 Days</span>
+                            <span class="stat-number text-info" th:text="${summary.dueSoon}">0</span>
+                        </div>
+                        <i class="bi bi-alarm-fill stat-icon text-info"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Progress Bar Card -->
+        <div class="card progress-card p-4 mb-4">
+            <div class="d-flex justify-content-between align-items-center mb-2">
+                <span class="fw-bold text-secondary">
+                    <i class="bi bi-pie-chart-fill me-1 text-success"></i> Completion Progress
+                </span>
+                <span class="badge bg-success-subtle text-success fs-6 fw-bold" th:text="${summary.completionPercentage} + '% Completed'">
+                    0% Completed
+                </span>
+            </div>
+            <div class="progress" role="progressbar" aria-label="Completion progress"
+                 th:aria-valuenow="${summary.completionPercentage}" aria-valuemin="0" aria-valuemax="100">
+                <div class="progress-bar progress-bar-striped progress-bar-animated"
+                     th:style="'width: ' + ${summary.completionPercentage} + '%;'"
+                     th:text="${summary.completionPercentage} + '%'">
+                </div>
+            </div>
+            <div class="d-flex justify-content-between text-muted small mt-2">
+                <span>0 Completed</span>
+                <span th:text="${summary.completed} + ' of ' + ${summary.total} + ' assignments completed'"></span>
+                <span th:text="${summary.total} + ' Total'"></span>
+            </div>
+        </div>
+
+        <!-- Upcoming Deadlines Table Card -->
+        <div class="card table-card">
+            <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center border-bottom">
+                <h2 class="h5 fw-bold mb-0">
+                    <i class="bi bi-clock-history text-primary me-2"></i>Upcoming Deadlines
+                </h2>
+                <span class="badge bg-secondary-subtle text-secondary" th:text="${assignments.size()} + ' assignments'"></span>
+            </div>
+
+            <div class="table-responsive">
+                <table class="table custom-table table-hover align-middle mb-0">
+                    <thead>
+                        <tr>
+                            <th style="width: 50px;">Status</th>
+                            <th>Assignment Title</th>
+                            <th>Subject</th>
+                            <th>Priority</th>
+                            <th>Due Date</th>
+                            <th>Time Left</th>
+                            <th class="text-end" style="width: 200px;">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Empty State -->
+                        <tr th:if="${#lists.isEmpty(assignments)}">
+                            <td colspan="7" class="text-center py-5 text-muted">
+                                <i class="bi bi-clipboard2-check fs-1 d-block mb-2 text-secondary"></i>
+                                <h5>No assignments recorded yet!</h5>
+                                <p class="mb-3">Start tracking your submissions by creating your first assignment.</p>
+                                <a th:href="@{/assignments/new}" class="btn btn-sm btn-primary">
+                                    <i class="bi bi-plus-circle me-1"></i> Add Assignment
+                                </a>
+                            </td>
+                        </tr>
+
+                        <!-- Assignment Rows with Visual Cues -->
+                        <tr th:each="assignment : ${assignments}"
+                            th:classappend="${assignment.isCompleted() ? 'row-completed' : (assignment.isOverdue() ? 'row-overdue' : (assignment.isDueSoon() ? 'row-due-soon' : 'row-normal'))}">
+
+                            <!-- Status Icon -->
+                            <td class="text-center">
+                                <span th:if="${assignment.isCompleted()}" title="Completed">
+                                    <i class="bi bi-check-circle-fill text-success fs-5"></i>
+                                </span>
+                                <span th:if="${!assignment.isCompleted() and assignment.isOverdue()}" title="Overdue">
+                                    <i class="bi bi-exclamation-circle-fill text-danger fs-5"></i>
+                                </span>
+                                <span th:if="${!assignment.isCompleted() and !assignment.isOverdue() and assignment.isDueSoon()}" title="Due Soon">
+                                    <i class="bi bi-hourglass-split text-warning fs-5"></i>
+                                </span>
+                                <span th:if="${!assignment.isCompleted() and !assignment.isOverdue() and !assignment.isDueSoon()}" title="Pending">
+                                    <i class="bi bi-circle text-muted fs-5"></i>
+                                </span>
+                            </td>
+
+                            <!-- Title -->
+                            <td>
+                                <div class="fw-semibold"
+                                     th:classappend="${assignment.isCompleted() ? 'title-completed' : 'text-dark'}"
+                                     th:text="${assignment.title}">Title</div>
+                                <small class="text-muted text-truncate d-block" style="max-width: 320px;"
+                                       th:text="${assignment.description != null ? assignment.description : ''}"></small>
+                            </td>
+
+                            <!-- Subject -->
+                            <td>
+                                <span class="badge bg-light text-dark border" th:text="${assignment.subject}">Subject</span>
+                            </td>
+
+                            <!-- Priority -->
+                            <td>
+                                <span class="badge"
+                                      th:classappend="'bg-' + ${assignment.priority.badgeClass}"
+                                      th:text="${assignment.priority.displayName}">Priority</span>
+                            </td>
+
+                            <!-- Due Date -->
+                            <td>
+                                <span class="fw-medium" th:text="${assignment.dueDate}">2026-10-30</span>
+                            </td>
+
+                            <!-- Visual Cue: Time Left / Overdue -->
+                            <td>
+                                <span th:if="${assignment.isCompleted()}" class="badge-completed">
+                                    <i class="bi bi-check2"></i> Completed
+                                </span>
+                                <span th:if="${!assignment.isCompleted() and assignment.isOverdue()}" class="badge-overdue">
+                                    <i class="bi bi-exclamation-triangle"></i> <span th:text="${assignment.getDeadlineText()}">Overdue</span>
+                                </span>
+                                <span th:if="${!assignment.isCompleted() and !assignment.isOverdue() and assignment.isDueSoon()}" class="badge-due-soon">
+                                    <i class="bi bi-alarm"></i> <span th:text="${assignment.getDeadlineText()}">Due Soon</span>
+                                </span>
+                                <span th:if="${!assignment.isCompleted() and !assignment.isOverdue() and !assignment.isDueSoon()}" class="badge-upcoming">
+                                    <i class="bi bi-calendar"></i> <span th:text="${assignment.getDeadlineText()}">Upcoming</span>
+                                </span>
+                            </td>
+
+                            <!-- Actions -->
+                            <td class="text-end">
+                                <div class="btn-group btn-group-sm" role="group">
+                                    <!-- Mark as Completed button -->
+                                    <a th:if="${!assignment.isCompleted()}"
+                                       th:href="@{/assignments/{id}/complete(id=${assignment.id})}"
+                                       class="btn btn-outline-success btn-action"
+                                       title="Mark as Completed">
+                                        <i class="bi bi-check-lg"></i>
+                                    </a>
+
+                                    <!-- Edit button -->
+                                    <a th:href="@{/assignments/{id}/edit(id=${assignment.id})}"
+                                       class="btn btn-outline-primary btn-action"
+                                       title="Edit Assignment">
+                                        <i class="bi bi-pencil-square"></i>
+                                    </a>
+
+                                    <!-- Delete button with confirmation -->
+                                    <a th:href="@{/assignments/{id}/delete(id=${assignment.id})}"
+                                       class="btn btn-outline-danger btn-action"
+                                       onclick="return confirm('Are you sure you want to delete this assignment?');"
+                                       title="Delete Assignment">
+                                        <i class="bi bi-trash3"></i>
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Footer -->
+    <footer th:replace="~{fragments/layout :: footer}"></footer>
+
+    <!-- Bootstrap Scripts -->
+    <th:block th:replace="~{fragments/layout :: scripts}"></th:block>
+
+</body>
+</html>
